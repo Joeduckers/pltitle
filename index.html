@@ -1,0 +1,523 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Premier League Title Race</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        body { font-family: Arial, sans-serif; text-align: center; }
+        table { width: 50%; margin: 20px auto; border-collapse: collapse; }
+        th, td { border: 1px solid black; padding: 10px; }
+        .winner { background-color: gold; }
+        .fixture-container {
+            display: flex;
+            justify-content: center;
+            gap: 25px;
+            margin: 20px;
+        }
+        .team-fixtures {
+            width: 300px;
+            border: 1px solid #ddd;
+            padding: 15px;
+            border-radius: 5px;
+        }
+        .fixture {
+            margin: 10px 0;
+            padding: 10px;
+            background: #f5f5f5;
+            border-radius: 3px;
+        }
+        .fixture-teams {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            margin: 5px 0;
+        }
+        .fixture-badge {
+            width: 20px;
+            height: 20px;
+            object-fit: contain;
+        }
+        .fixture-buttons {
+            margin-top: 5px;
+        }
+        .fixture-buttons button {
+            margin: 0 5px;
+            padding: 5px 10px;
+            cursor: pointer;
+        }
+        .completed {
+            background: #e0e0e0;
+            opacity: 0.7;
+        }
+        .winner-status {
+            margin: 20px auto;
+            padding: 15px;
+            border-radius: 5px;
+            font-weight: bold;
+            font-size: 1.2em;
+            width: 80%;
+            max-width: 600px;
+        }
+        .can-win {
+            background-color: #e3f2fd;
+            color: #1565c0;
+            border: 2px solid #1565c0;
+        }
+        .champion {
+            background-color: #fff3e0;
+            color: #e65100;
+            border: 2px solid #e65100;
+        }
+        .eliminated {
+            background-color: #ffebee;
+            color: #c62828;
+            border: 2px solid #c62828;
+        }
+        .completed.win {
+            background: #c8e6c9;  /* Light green */
+            border: 1px solid #4caf50;
+            opacity: 1;
+        }
+        .completed.draw {
+            background: #ffe0b2;  /* Light orange */
+            border: 1px solid #ff9800;
+            opacity: 1;
+        }
+        .completed.loss {
+            background: #ffcdd2;  /* Light red */
+            border: 1px solid #f44336;
+            opacity: 1;
+        }
+        .team-name {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .team-badge {
+            width: 30px;
+            height: 30px;
+            object-fit: contain;
+        }
+        .stat-icon {
+            color: #666;
+            font-size: 0.9em;
+        }
+        .title-header {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+        }
+        .trophy-icon {
+            color: gold;
+            font-size: 1.2em;
+        }
+        th {
+            white-space: nowrap;
+        }
+    </style>
+</head>
+<body>
+    <h1 class="title-header">
+        <i class="fas fa-trophy trophy-icon"></i>
+        Premier League Title Race 2023/24
+        <i class="fas fa-trophy trophy-icon"></i>
+    </h1>
+    <table>
+        <thead>
+            <tr>
+                <th>Team</th>
+                <th>Played</th>
+                <th><i class="fas fa-check stat-icon"></i> Wins</th>
+                <th><i class="fas fa-equals stat-icon"></i> Draws</th>
+                <th><i class="fas fa-xmark stat-icon"></i> Losses</th>
+                <th><i class="fas fa-star stat-icon"></i> Points</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr id="liverpool">
+                <td>
+                    <div class="team-name">
+                        <img src="https://1000logos.net/wp-content/uploads/2017/04/Logo-Liverpool.png" alt="Liverpool" class="team-badge">
+                        Liverpool FC
+                    </div>
+                </td>
+                <td id="l-played">27</td>
+                <td id="l-wins">19</td>
+                <td id="l-draws">7</td>
+                <td id="l-losses">1</td>
+                <td id="l-points">64</td>
+            </tr>
+            <tr id="arsenal">
+                <td>
+                    <div class="team-name">
+                        <img src="https://resources.premierleague.com/premierleague/badges/t3.png" alt="Arsenal" class="team-badge">
+                        Arsenal FC
+                    </div>
+                </td>
+                <td id="a-played">26</td>
+                <td id="a-wins">15</td>
+                <td id="a-draws">8</td>
+                <td id="a-losses">3</td>
+                <td id="a-points">53</td>
+            </tr>
+        </tbody>
+    </table>
+    
+    <div id="winner-status" class="winner-status can-win">
+        <i class="fas fa-trophy trophy-icon"></i>
+        Title race ongoing - both teams can still win
+        <i class="fas fa-trophy trophy-icon"></i>
+    </div>
+    
+    <button onclick="resetLeague()" style="margin: 20px; padding: 10px 20px; font-size: 1.1em; cursor: pointer;">Reset Simulation</button>
+    
+    <div class="fixture-container">
+        <div class="team-fixtures">
+            <h3>Liverpool Remaining Fixtures</h3>
+            <div id="liverpool-fixtures">
+                <!-- Fixtures will be populated by JavaScript -->
+            </div>
+        </div>
+        <div class="team-fixtures">
+            <h3>Arsenal Remaining Fixtures</h3>
+            <div id="arsenal-fixtures">
+                <!-- Fixtures will be populated by JavaScript -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let liverpool = { 
+            played: 27, 
+            wins: 19, 
+            draws: 7, 
+            losses: 1, 
+            points: 64 
+        };
+        
+        let arsenal = { 
+            played: 26, 
+            wins: 15, 
+            draws: 8, 
+            losses: 3, 
+            points: 53 
+        };
+        
+        const maxPoints = 114; // Maximum possible points in a 38-game season
+
+        function updateScore(team, isHeadToHead = false) {
+            if (team === 'liverpool') {
+                liverpool.played++;
+                liverpool.wins++;
+                liverpool.points = (liverpool.wins * 3) + liverpool.draws; // Calculate total points
+                if (isHeadToHead) {
+                    arsenal.played++;
+                    arsenal.losses++;
+                    arsenal.points = (arsenal.wins * 3) + arsenal.draws; // Recalculate points
+                }
+            } else if (team === 'arsenal') {
+                arsenal.played++;
+                arsenal.wins++;
+                arsenal.points = (arsenal.wins * 3) + arsenal.draws; // Calculate total points
+                if (isHeadToHead) {
+                    liverpool.played++;
+                    liverpool.losses++;
+                    liverpool.points = (liverpool.wins * 3) + liverpool.draws; // Recalculate points
+                }
+            } else { // draw or loss
+                if (isHeadToHead) {
+                    liverpool.played++;
+                    arsenal.played++;
+                    if (team === 'draw') {
+                        liverpool.draws++;
+                        arsenal.draws++;
+                    } else {
+                        // Handle loss for head to head
+                        if (arguments[1] === 'liverpool') {
+                            liverpool.losses++;
+                            arsenal.wins++;
+                        } else {
+                            arsenal.losses++;
+                            liverpool.wins++;
+                        }
+                    }
+                    liverpool.points = (liverpool.wins * 3) + liverpool.draws;
+                    arsenal.points = (arsenal.wins * 3) + arsenal.draws;
+                } else {
+                    // Single team draw or loss
+                    if (arguments[1] === 'liverpool') {
+                        liverpool.played++;
+                        if (team === 'draw') {
+                            liverpool.draws++;
+                        } else {
+                            liverpool.losses++;
+                        }
+                        liverpool.points = (liverpool.wins * 3) + liverpool.draws;
+                    } else {
+                        arsenal.played++;
+                        if (team === 'draw') {
+                            arsenal.draws++;
+                        } else {
+                            arsenal.losses++;
+                        }
+                        arsenal.points = (arsenal.wins * 3) + arsenal.draws;
+                    }
+                }
+            }
+            updateTable();
+            checkWinner();
+        }
+
+        function updateTable() {
+            document.getElementById("l-played").textContent = liverpool.played;
+            document.getElementById("l-wins").textContent = liverpool.wins;
+            document.getElementById("l-draws").textContent = liverpool.draws;
+            document.getElementById("l-losses").textContent = liverpool.losses;
+            document.getElementById("l-points").textContent = liverpool.points;
+
+            document.getElementById("a-played").textContent = arsenal.played;
+            document.getElementById("a-wins").textContent = arsenal.wins;
+            document.getElementById("a-draws").textContent = arsenal.draws;
+            document.getElementById("a-losses").textContent = arsenal.losses;
+            document.getElementById("a-points").textContent = arsenal.points;
+        }
+
+        function checkWinner() {
+            const remainingGames = 38 - Math.max(liverpool.played, arsenal.played);
+            const maxPossiblePoints = {
+                liverpool: liverpool.points + (remainingGames * 3),
+                arsenal: arsenal.points + (remainingGames * 3)
+            };
+
+            const statusDiv = document.getElementById("winner-status");
+            
+            if (liverpool.points > maxPossiblePoints.arsenal) {
+                document.getElementById("liverpool").classList.add("winner");
+                statusDiv.className = "winner-status champion";
+                statusDiv.innerHTML = '<i class="fas fa-trophy trophy-icon"></i> Liverpool FC are Premier League Champions! 🏆 <i class="fas fa-trophy trophy-icon"></i>';
+            } else if (arsenal.points > maxPossiblePoints.liverpool) {
+                document.getElementById("arsenal").classList.add("winner");
+                statusDiv.className = "winner-status champion";
+                statusDiv.innerHTML = '<i class="fas fa-trophy trophy-icon"></i> Arsenal FC are Premier League Champions! 🏆 <i class="fas fa-trophy trophy-icon"></i>';
+            } else if (liverpool.points + (remainingGames * 3) < arsenal.points) {
+                statusDiv.className = "winner-status eliminated";
+                statusDiv.innerHTML = '<i class="fas fa-times-circle"></i> Liverpool FC can no longer win the league';
+            } else if (arsenal.points + (remainingGames * 3) < liverpool.points) {
+                statusDiv.className = "winner-status eliminated";
+                statusDiv.innerHTML = '<i class="fas fa-times-circle"></i> Arsenal FC can no longer win the league';
+            } else {
+                statusDiv.className = "winner-status can-win";
+                statusDiv.innerHTML = '<i class="fas fa-trophy trophy-icon"></i> Title race ongoing - both teams can still win <i class="fas fa-trophy trophy-icon"></i>';
+            }
+        }
+
+        function resetLeague() {
+            liverpool = { 
+                played: 27, 
+                wins: 19, 
+                draws: 7, 
+                losses: 1, 
+                points: 64 
+            };
+            arsenal = { 
+                played: 26, 
+                wins: 15, 
+                draws: 8, 
+                losses: 3, 
+                points: 53 
+            };
+            document.getElementById("liverpool").classList.remove("winner");
+            document.getElementById("arsenal").classList.remove("winner");
+            
+            // Reset all fixtures
+            document.getElementById('liverpool-fixtures').innerHTML = '';
+            document.getElementById('arsenal-fixtures').innerHTML = '';
+            initializeFixtures();
+            
+            updateTable();
+        }
+
+        const liverpoolFixtures = [
+            { opponent: "Newcastle", date: "26 Feb", home: true },
+            { opponent: "Southampton", date: "8 March", home: true },
+            { opponent: "Everton", date: "2 April", home: true },
+            { opponent: "Fulham", date: "5 April", home: false },
+            { opponent: "West Ham", date: "12 April", home: true },
+            { opponent: "Leicester", date: "19 April", home: false },
+            { opponent: "Tottenham", date: "26 April", home: true },
+            { opponent: "Chelsea", date: "3 May", home: false },
+            { opponent: "Arsenal", date: "10 May", home: true },
+            { opponent: "Brighton", date: "18 May", home: false },
+            { opponent: "Crystal Palace", date: "25 May", home: true },
+        ];
+
+        const arsenalFixtures = [
+            { opponent: "Nottingham Forest", date: "26 Feb", home: false },
+            { opponent: "Manchester United", date: "19 March", home: false },
+            { opponent: "Chelsea", date: "16 March", home: true },
+            { opponent: "Fulham", date: "1 Apr", home: true },
+            { opponent: "Everton", date: "5 Apr", home: false },
+            { opponent: "Brentford", date: "12 Apr", home: true },
+            { opponent: "Ipswich", date: "19 April", home: false },
+            { opponent: "Crystal Palace", date: "26 April", home: true },
+            { opponent: "Bournemouth", date: "3 May", home: true },
+            { opponent: "Liverpool", date: "10 May", home: false },
+            { opponent: "Newcastle", date: "18 May", home: true },
+            { opponent: "Southampton", date: "25 May", home: false }
+        ];
+
+        // Add badge URLs object
+        const teamBadges = {
+            'Liverpool': 'https://1000logos.net/wp-content/uploads/2017/04/Logo-Liverpool.png',
+            'Arsenal': 'https://resources.premierleague.com/premierleague/badges/t3.png',
+            'Manchester United': 'https://resources.premierleague.com/premierleague/badges/t1.png',
+            'Chelsea': 'https://resources.premierleague.com/premierleague/badges/t8.png',
+            'Manchester City': 'https://resources.premierleague.com/premierleague/badges/t43.png',
+            'Tottenham': 'https://resources.premierleague.com/premierleague/badges/t6.png',
+            'Newcastle': 'https://resources.premierleague.com/premierleague/badges/t4.png',
+            'Brighton': 'https://resources.premierleague.com/premierleague/badges/t36.png',
+            'West Ham': 'https://resources.premierleague.com/premierleague/badges/t21.png',
+            'Fulham': 'https://resources.premierleague.com/premierleague/badges/t54.png',
+            'Crystal Palace': 'https://resources.premierleague.com/premierleague/badges/t31.png',
+            'Everton': 'https://resources.premierleague.com/premierleague/badges/t11.png',
+            'Bournemouth': 'https://resources.premierleague.com/premierleague/badges/t91.png',
+            'Brentford': 'https://resources.premierleague.com/premierleague/badges/t94.png',
+            'Wolves': 'https://resources.premierleague.com/premierleague/badges/t39.png',
+            'Aston Villa': 'https://resources.premierleague.com/premierleague/badges/t7.png',
+            'Nottingham Forest': 'https://resources.premierleague.com/premierleague/badges/t17.png',
+            'Luton': 'https://resources.premierleague.com/premierleague/badges/t102.png',
+            'Southampton': 'https://1000logos.net/wp-content/uploads/2018/07/Southampton-Logo.png',
+            'Leicester': 'https://upload.wikimedia.org/wikipedia/en/2/2d/Leicester_City_crest.svg',
+            'Ipswich': 'https://banner2.cleanpng.com/20180705/bcr/kisspng-ipswich-town-f-c-english-football-league-portman-5b3e995eeff9e2.727288921530829150983.jpg'
+        };
+
+        function createFixtureElement(fixture, team) {
+            const div = document.createElement('div');
+            div.className = 'fixture';
+            const homeOrAway = fixture.home ? 'Home' : 'Away';
+            const teamBadgeUrl = teamBadges[team];
+            const opponentBadgeUrl = teamBadges[fixture.opponent] || '';
+            
+            div.innerHTML = `
+                <div>${fixture.date} - ${homeOrAway}</div>
+                <div class="fixture-teams">
+                    ${fixture.home ? 
+                        `<img src="${teamBadgeUrl}" alt="${team}" class="fixture-badge">
+                         ${team} vs 
+                         <img src="${opponentBadgeUrl}" alt="${fixture.opponent}" class="fixture-badge">
+                         ${fixture.opponent}` : 
+                        `<img src="${opponentBadgeUrl}" alt="${fixture.opponent}" class="fixture-badge">
+                         ${fixture.opponent} vs 
+                         <img src="${teamBadgeUrl}" alt="${team}" class="fixture-badge">
+                         ${team}`}
+                </div>
+                <div class="fixture-buttons">
+                    <button onclick="handleFixtureResult('${team.toLowerCase()}', 'win', this)">Win</button>
+                    <button onclick="handleFixtureResult('${team.toLowerCase()}', 'draw', this)">Draw</button>
+                    <button onclick="handleFixtureResult('${team.toLowerCase()}', 'lose', this)">Lose</button>
+                </div>
+            `;
+            return div;
+        }
+
+        function handleFixtureResult(team, result, buttonElement) {
+            const fixtureDiv = buttonElement.closest('.fixture');
+            fixtureDiv.classList.add('completed');
+            const resultClass = result === 'lose' ? 'loss' : result;
+            fixtureDiv.classList.add(resultClass);
+            fixtureDiv.querySelector('.fixture-buttons').style.display = 'none';
+            
+            // Get opponent from the fixture div text
+            const fixtureText = fixtureDiv.textContent;
+            const isHeadToHead = (team === 'liverpool' && fixtureText.includes('Arsenal')) || 
+                                (team === 'arsenal' && fixtureText.includes('Liverpool'));
+            
+            // Update stats for the team whose fixture was played
+            if (team === 'liverpool') {
+                liverpool.played++;
+                if (result === 'win') {
+                    liverpool.wins++;
+                    liverpool.points += 3;
+                } else if (result === 'draw') {
+                    liverpool.draws++;
+                    liverpool.points += 1;
+                } else { // lose
+                    liverpool.losses++;
+                    // no points added for loss
+                }
+            } else if (team === 'arsenal') {
+                arsenal.played++;
+                if (result === 'win') {
+                    arsenal.wins++;
+                    arsenal.points += 3;
+                } else if (result === 'draw') {
+                    arsenal.draws++;
+                    arsenal.points += 1;
+                } else { // lose
+                    arsenal.losses++;
+                    // no points added for loss
+                }
+            }
+
+            // If it's a head-to-head match, update the other team's stats
+            if (isHeadToHead) {
+                const otherTeam = team === 'liverpool' ? arsenal : liverpool;
+                otherTeam.played++;
+                
+                if (result === 'win') {
+                    otherTeam.losses++;
+                } else if (result === 'draw') {
+                    otherTeam.draws++;
+                    otherTeam.points += 1;
+                } else { // if this team lost, other team won
+                    otherTeam.wins++;
+                    otherTeam.points += 3;
+                }
+
+                // Update the other team's fixture display
+                const otherFixtures = document.getElementById(`${team === 'liverpool' ? 'arsenal' : 'liverpool'}-fixtures`);
+                const matchingFixture = Array.from(otherFixtures.getElementsByClassName('fixture'))
+                    .find(f => f.textContent.includes(team === 'liverpool' ? 'Liverpool' : 'Arsenal'));
+                
+                if (matchingFixture) {
+                    matchingFixture.classList.add('completed');
+                    // Add opposite result class for the other team
+                    if (result === 'win') {
+                        matchingFixture.classList.add('loss');
+                    } else if (result === 'loss') {
+                        matchingFixture.classList.add('win');
+                    } else {
+                        matchingFixture.classList.add('draw');
+                    }
+                    matchingFixture.querySelector('.fixture-buttons').style.display = 'none';
+                }
+            }
+
+            updateTable();
+            checkWinner();
+        }
+
+        function initializeFixtures() {
+            const liverpoolContainer = document.getElementById('liverpool-fixtures');
+            const arsenalContainer = document.getElementById('arsenal-fixtures');
+
+            liverpoolFixtures.forEach(fixture => {
+                liverpoolContainer.appendChild(createFixtureElement(fixture, 'Liverpool'));
+            });
+
+            arsenalFixtures.forEach(fixture => {
+                arsenalContainer.appendChild(createFixtureElement(fixture, 'Arsenal'));
+            });
+        }
+
+        // Make sure to call initializeFixtures() when the page loads
+        window.onload = function() {
+            initializeFixtures();
+        };
+    </script>
+</body>
+</html>
