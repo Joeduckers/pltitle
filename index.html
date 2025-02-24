@@ -118,6 +118,93 @@
         th {
             white-space: nowrap;
         }
+        
+        /* Responsive Design */
+        @media screen and (max-width: 768px) {
+            table {
+                width: 95%;  /* Wider table on mobile */
+                font-size: 0.9em;
+            }
+            
+            .fixture-container {
+                flex-direction: column;  /* Stack fixtures vertically */
+                align-items: center;
+                gap: 10px;
+            }
+            
+            .team-fixtures {
+                width: 95%;  /* Full width minus margins */
+                margin: 5px;
+            }
+            
+            .fixture {
+                font-size: 0.9em;
+            }
+            
+            .fixture-teams {
+                flex-wrap: wrap;  /* Allow wrapping for long team names */
+                justify-content: center;
+            }
+            
+            .winner-status {
+                width: 95%;
+                font-size: 1em;
+                padding: 10px;
+            }
+            
+            .team-name {
+                font-size: 0.9em;
+            }
+            
+            .team-badge {
+                width: 25px;  /* Slightly smaller badges */
+                height: 25px;
+            }
+            
+            .fixture-badge {
+                width: 18px;  /* Slightly smaller fixture badges */
+                height: 18px;
+            }
+            
+            .fixture-buttons button {
+                padding: 8px 15px;
+                margin: 3px;
+                font-size: 0.9em;
+            }
+            
+            h1 {
+                font-size: 1.5em;
+                padding: 10px;
+            }
+            
+            h3 {
+                font-size: 1.2em;
+            }
+        }
+
+        /* Even smaller screens */
+        @media screen and (max-width: 480px) {
+            table {
+                font-size: 0.8em;
+            }
+            
+            th, td {
+                padding: 5px;
+            }
+            
+            .fixture {
+                font-size: 0.8em;
+            }
+            
+            .fixture-buttons button {
+                padding: 5px 10px;
+                font-size: 0.8em;
+            }
+            
+            .winner-status {
+                font-size: 0.9em;
+            }
+        }
     </style>
 </head>
 <body>
